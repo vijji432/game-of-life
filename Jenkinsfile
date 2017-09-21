@@ -9,7 +9,7 @@ try {
     stage 'Build'
       git branch: 'dev', credentialsId: 'pashupathi', url: 'https://github.com/pashupathi/game-of-life.git'
       sh "git tag -a ${env.BUILD_TAG} -m 'Jenkins Build Tag ${env.BUILD_TAG}'"
-      sh 'git push --tags'
+      sh 'git push https://pashupathi@github.com/pashupathi/game-of-life.git --tags'
 	
       sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
     stage 'Test'
