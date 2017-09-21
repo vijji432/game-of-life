@@ -29,11 +29,10 @@ try {
     // Use the SSH Agent Plugin to forward the used ssh credentials 
     // from the jenkins master to the jenkins slave. Otherwise you may 
     // not be able to push/pull, clone
-	withCredentials([usernamePassword(credentialsId: 'pashupathi', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+	withCredentials(credentialsId: 'pashupathi') {
 		sh "git push origin dev"
       		sh "git push origin v${v}"
-    
-    }
+	}
     
     /*stage 'Build'
          sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
