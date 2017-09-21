@@ -7,9 +7,7 @@ try {
     sh "rm -rf .git"
     // Clone from git
     checkout scm
-    // Checkout specific local branch
-    checkout([$class: 'GitSCM', branches: [[name: '*/dev']],
-        extensions: [[$class: 'CleanCheckout'],[$class: 'LocalBranch', localBranch: "dev"]]])
+    
 
 	
     stage 'Set Version'
