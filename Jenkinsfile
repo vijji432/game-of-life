@@ -7,7 +7,7 @@ try {
     checkout scm
 
     stage 'Build'
-      sh("git tag -a ${env.BUILD_TAG} -m '${repositoryCommiterMessage}'")
+      sh "git tag -a ${env.BUILD_TAG} -m '${repositoryCommiterMessage}'"
       sh '/opt/maven/bin/mvn clean install -DskipTests -U'
       sh 'git push origin dev --tags")
       
