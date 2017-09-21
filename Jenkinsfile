@@ -5,15 +5,12 @@ try {
     stage 'Checkout'
     sh 'echo checking out'
     checkout scm
+	sh "git tag -a ${env.BUILD_TAG} -m 'Jenkins Build Tag ${env.BUILD_TAG}'"
+        sh 'git push origin --tags'
 
     stage 'Build'
-     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'pashupathi', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
-    sh "git tag -a ${env.BUILD_TAG} -m 'Jenkins Build Tag ${env.BUILD_TAG}'"
-      sh 'git push https://pashupathi@github.com/pashupathi/game-of-life.git --tags'
-  }
-      
+         sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
 	
-      sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
     stage 'Test'
       sh 'echo test'
 	
