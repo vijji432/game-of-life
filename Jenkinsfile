@@ -34,7 +34,7 @@ try {
     // from the jenkins master to the jenkins slave. Otherwise you may 
     // not be able to push/pull, clone
 		git branch: 'master', credentialsId: 'pashupathi', url: 'https://pashupathi@github.com/pashupathi/game-of-life'
-		sh "git push dev"
+		sh "git push"
       		sh "git push origin v${v}"
     
     stage 'Build'
