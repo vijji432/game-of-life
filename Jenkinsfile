@@ -2,11 +2,15 @@ node {
 	
 try {
 
-    stage 'Checkout'
-    sh 'echo checking out'
+      // Cleanup local checkout - TODO there should also be a dedicated jenkins command to invoke this action
+    sh "rm -rf *"
+    sh "rm -rf .git"
+    // Clone from git
     checkout scm
-	 checkout([$class: 'GitSCM', branches: [[name: '*/dev']],
+    // Checkout specific local branch
+    checkout([$class: 'GitSCM', branches: [[name: '*/dev']],
         extensions: [[$class: 'CleanCheckout'],[$class: 'LocalBranch', localBranch: "dev"]]])
+
 	
     stage 'Set Version'
     def originalV = version();
