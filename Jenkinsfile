@@ -1,6 +1,9 @@
 node {
 	
 try {
+	sh 'git config --global user.name "pashupathi"'
+    	sh 'git config --global user.email srinivasa.pashupathi@gmail.com'
+
 
       // Cleanup local checkout - TODO there should also be a dedicated jenkins command to invoke this action
     sh "rm -rf *"
