@@ -28,16 +28,16 @@ try {
     sh "git commit -m 'Raise version'"
     sh "git tag v${v}"
 	// Create the release build
-    stage 'Release Build'
+    /*stage 'Release Build'
     // Use the SSH Agent Plugin to forward the used ssh credentials 
     // from the jenkins master to the jenkins slave. Otherwise you may 
     // not be able to push/pull, clone
 		sh "git push https://${GITUSER_USR}:${GITUSER_PSW}@https://github.com/pashupathi/game-of-life.git dev"
       		sh "git push origin v${v}"
-    
-    /*stage 'Build'
+    */
+    stage 'Build'
          sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
-	*/
+	
     stage 'Test'
       sh 'echo test'
 	
