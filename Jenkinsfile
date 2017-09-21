@@ -7,8 +7,7 @@ try {
     checkout scm
 
     stage 'Build'
-	 withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'pashupathi',
-        usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD']]) {
+	 git credentialsId: 'pashupathi'
       sh "git tag -a ${env.BUILD_TAG} -m 'Jenkins Build Tag ${env.BUILD_TAG}'"
       sh '/opt/maven/bin/mvn clean install -DskipTests -U'
       sh 'git push -u origin dev --tags'
