@@ -3,6 +3,7 @@ node {
 try {
 	sh 'git config --global user.name "pashupathi"'
     	sh 'git config --global user.email srinivasa.pashupathi@gmail.com'
+	sh 'git config --global push.default simple'
 
 
       // Cleanup local checkout - TODO there should also be a dedicated jenkins command to invoke this action
