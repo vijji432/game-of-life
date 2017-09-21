@@ -7,7 +7,7 @@ try {
     checkout scm
 
     stage 'Build'
-     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '012ce21d-e920-44ee-b6f7-08df8ab41de0', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
+     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'pashupathi', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
     sh "git tag -a ${env.BUILD_TAG} -m 'Jenkins Build Tag ${env.BUILD_TAG}'"
       sh 'git push https://pashupathi@github.com/pashupathi/game-of-life.git --tags'
   }
