@@ -26,7 +26,7 @@ try {
         from: 'build@localhost',
         replyTo: 'build@localhost',
         subject: "${env.JOB_NAME}-${env.BUILD_NUMBER} build successful",
-        to: ""
+        to: "srinivasa.pashupathi@gmail.com"
 		}
 
   catch (err) {
