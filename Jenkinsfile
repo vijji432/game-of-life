@@ -51,11 +51,15 @@ node {
     stage 'Build'
          	sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
 	
-    stage 'Test'{
-		 stage 'mUnit' {
+    stage 'Test'
+		 stage 'mUnit' 
 			// We have no regression tests yet
-			}  
-    		}
+			sh 'echo Test'
+		stage 'postman'
+			sh ' echo postman'
+			// need npm package - newman to run them
+			 
+    		
     stage 'SonarQube'
 			sh 'echo Sonar'
 			/* timeout (time: timeouts.sonarcube, unit: timeouts.unit) {
