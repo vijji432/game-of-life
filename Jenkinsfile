@@ -1,17 +1,19 @@
 node {
+	
 try {
 
     stage 'Checkout'
     sh 'echo checking out'
     checkout scm
-	
-
-    stage 'Test'
-      sh 'echo test'
 
     stage 'Build'
+      sh("git tag -a ${env.BUILD_TAG} -m '${repositoryCommiterMessage}'")
       sh '/opt/maven/bin/mvn clean install -DskipTests -U'
+      sh 'git push origin dev --tags")
       
+    stage 'Test'
+      sh 'echo test'
+	
     stage 'Deploy'
 
       echo 'Push to Repo'
