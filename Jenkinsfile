@@ -7,11 +7,12 @@ try {
     checkout scm
 
     stage 'Build'
-	 git credentialsId: 'pashupathi'
+	 withCredentials([[credentialsId: 'pashupathi', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) 
+	{
       sh "git tag -a ${env.BUILD_TAG} -m 'Jenkins Build Tag ${env.BUILD_TAG}'"
-      sh '/opt/maven/bin/mvn clean install -DskipTests -U'
       sh 'git push -u origin dev --tags'
-      
+	 }
+      sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
     stage 'Test'
       sh 'echo test'
 	
