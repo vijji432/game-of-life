@@ -18,7 +18,7 @@ try {
     if (v) {
        echo "Building version ${v}"
     }
-    
+    sh "/opt/maven/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${v}"
     
     /*stage 'Build'
          sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
