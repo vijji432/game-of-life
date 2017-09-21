@@ -26,7 +26,7 @@ try {
         from: 'build@localhost',
         replyTo: 'build@localhost',
         subject: "${env.JOB_NAME}-${env.BUILD_NUMBER} build successful",
-        to: "srinivasa.pashupathi@gmail.com"
+        to: "srinivasa.pashupathi@gmail.com", body: "Please go to ${env.BUILD_URL}."
 		}
 
   catch (err) {
@@ -37,7 +37,7 @@ try {
       from: 'build@localhost',
       replyTo: 'build@localhost',
       subject: "${env.JOB_NAME}-${env.BUILD_NUMBER} build failed",
-      to: "srinivasa.pashupathi@gmail.com"
+      to: "srinivasa.pashupathi@gmail.com", body: "Please go to ${env.BUILD_URL}."
       throw err
     
   }
