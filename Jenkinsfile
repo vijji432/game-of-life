@@ -33,7 +33,7 @@ try {
     // Use the SSH Agent Plugin to forward the used ssh credentials 
     // from the jenkins master to the jenkins slave. Otherwise you may 
     // not be able to push/pull, clone
-		git branch: 'dev', credentialsId: 'pashupathi', url: 'https://pashupathi@github.com/pashupathi/game-of-life.git'
+		git credentialsId: 'pashupathi'
 		sh "git push"
       		sh "git push origin v${v}"
     
