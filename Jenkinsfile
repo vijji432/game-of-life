@@ -22,22 +22,22 @@ try {
       // echo sh(returnStdout: true, script: 'env')
 
       
-      mail body: "${env.JOB_NAME}-${env.BUILD_NUMBER} build successful",
+      mail body: "${env.JOB_NAME}-${env.BUILD_NUMBER} build successful, Please go to ${env.BUILD_URL}.",
         from: 'build@localhost',
         replyTo: 'build@localhost',
         subject: "${env.JOB_NAME}-${env.BUILD_NUMBER} build successful",
-        to: "srinivasa.pashupathi@gmail.com", body: "Please go to ${env.BUILD_URL}."
+        to: "srinivasa.pashupathi@gmail.com", body: "
 		}
 
   catch (err) {
     currentBuild.result = "FAILURE"
 
    
-    mail body: "${env.JOB_NAME}-${env.BUILD_NUMBER} build error is here: ${env.BUILD_URL}" ,
+    mail body: "${env.JOB_NAME}-${env.BUILD_NUMBER} build error is here: ${env.BUILD_URL}, Please go to ${env.BUILD_URL}." ,
       from: 'build@localhost',
       replyTo: 'build@localhost',
       subject: "${env.JOB_NAME}-${env.BUILD_NUMBER} build failed",
-      to: "srinivasa.pashupathi@gmail.com", body: "Please go to ${env.BUILD_URL}."
+      to: "srinivasa.pashupathi@gmail.com"
       throw err
     
   }
