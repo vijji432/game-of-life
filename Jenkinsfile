@@ -1,5 +1,5 @@
 node {
-	
+	GITUSER = credentials('pashupathi')
 try {
 	sh 'git config --global user.name "pashupathi"'
     	sh 'git config --global user.email srinivasa.pashupathi@gmail.com'
@@ -32,10 +32,8 @@ try {
     // Use the SSH Agent Plugin to forward the used ssh credentials 
     // from the jenkins master to the jenkins slave. Otherwise you may 
     // not be able to push/pull, clone
-	withCredentials(credentialsId: 'pashupathi') {
-		sh "git push origin dev"
+		sh "git push https://${GITUSER_USR}:${GITUSER_PSW}@https://github.com/pashupathi/game-of-life.git dev"
       		sh "git push origin v${v}"
-	}
     
     /*stage 'Build'
          sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
