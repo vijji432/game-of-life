@@ -1,2 +1,275 @@
-step 'test'
-sh 'echo hello from jenkinsfile'
+#!groovy
+
+/**
+ * This is the jenkins pipeline as described in https://levigo.de/info/x/IgPFAg
+ * 
+ * It performs the following steps:
+ *   - maven build
+ *   - JUnit tests
+ *   - Checking sonar code quality
+ *   - Regression tests
+ *   - maven deployment to nexus
+ *   - (opt) Performing a release
+ *
+ * It depends on the following (non-default) plugins:
+ *   - Stash Notifier
+ *   - SSH Agent Plugin
+ *
+ * Other prerequisites:
+ *   - There must be a private SSH key provided in jenkins global security settings with id 'jenkins-ssh'
+ *   - The maven settings.xml must be configured in jenkins global security with id 'mavenSettings'
+ *   - Maven 3 must be installed as tool named 'M3'
+ *   - Java 7 must be installed as tool named 'JDK7'
+ *   - Java 8 must be installed as tool named 'JDK8'
+ */
+
+// Configurable values
+// -------------------
+
+// SonarQube Host URL
+def SONAR_HOST = 'http://sonarqube:9000'
+
+// Who is allowed to promote for a release? (comma separated, no blanks!)
+def RELEASE_PROMOTERS = 'pashupathi'
+
+// Timeouts how long the individual stages might take before they fail
+def timeouts = [
+	unit: 'MINUTES',
+	preparation: 2,
+	compile: 2,
+	junit: 5,
+	sonarcube: 5,
+	owasp: 25, // Downloading the latest  Vulnerability Database might take a while!
+	regression: 1,
+	deploy: 2,
+	release_promote: 15, // This stage contains a manual trigger!
+	pre_release: 2,
+	release: 3,
+	post_release: 1
+]
+	
+
+// If a release is triggered, the pipeline requires to use a tmp branch. What's its prefix?
+def RELEASE_BRANCH_PREFIX = 'release/'
+
+// Name of the master branch
+def MASTER = 'master'
+
+
+// Runtime values
+// --------------
+
+def pom = ''
+
+
+node() {
+	step([$class: 'StashNotifier']) // Notify stash of an INPROGRESS build
+	try {
+		env.PATH = "${tool 'M3'}/bin:${tool 'JDK7'}/bin:${env.PATH}"
+		
+		withEnv(["PATH=$env.PATH", "JAVA_HOME=${tool 'JDK7'}"]) {
+			withCredentials([file(credentialsId: 'mavenSettings', variable: 'MVN_SETTINGS')]) {
+				stage ('Preparation') {
+					timeout (time: timeouts.preparation, unit: timeouts.unit) {
+						checkout scm
+						pom = readFile('pom.xml')
+						sh "mvn -B -s $MVN_SETTINGS -gs $MVN_SETTINGS clean"
+					}
+				}
+				
+				stage ('Compile') {
+					timeout (time: timeouts.compile, unit: timeouts.unit) {
+						sh "mvn -B -s $MVN_SETTINGS -gs $MVN_SETTINGS install -DskipTests"
+					}
+				}
+			
+// Caveat: Blue Ocean does not show hierarchical stages (yet?)	
+//				stage ('Tests') {
+					stage ('JUnit') {
+						timeout (time: timeouts.junit, unit: timeouts.unit) {
+							sh "mvn -B -s $MVN_SETTINGS -gs $MVN_SETTINGS -Dmaven.test.failure.ignore install"
+							junit '**/target/surefire-reports/TEST-*.xml'
+							if (currentBuild.result == 'UNSTABLE') {
+								error 'There are test failures'
+							}
+						}
+					}
+					if (env.BRANCH_NAME == MASTER) {
+						parallel(sonarCube: {
+							stage ('SonarCube') {
+								timeout (time: timeouts.sonarcube, unit: timeouts.unit) {
+									// maven sonar plugin requires java 8!
+									withEnv(["JAVA_HOME=${tool 'JDK8'}"]) {
+										sh "mvn -B -s $MVN_SETTINGS -gs $MVN_SETTINGS sonar:sonar -Denforcer.skip -Dsonar.host.url=$SONAR_HOST"
+									}
+								}
+							}
+						}, owasp: {
+							stage ('OWASP Dependency Check') {
+								timeout (time: timeouts.owasp, unit: timeouts.unit) {
+									sh "mvn -B -s $MVN_SETTINGS -gs $MVN_SETTINGS org.owasp:dependency-check-maven:aggregate"
+									archiveArtifacts artifacts: '**/target/dependency-check-report.html', fingerprint: false, allowEmptyArchive: true
+								}
+							}
+						}) // end of parallel
+					}
+					// We have no regression tests yet
+					/*
+					if (env.BRANCH_NAME == MASTER) {
+						stage ('Regression') {
+							timeout (time: timeouts.regression, unit: timeouts.unit) {
+								echo 'Hello Regression Tests'
+							}
+						}
+					}
+					*/
+	//			}
+
+				if (env.BRANCH_NAME == MASTER) {
+					stage ('Deploy') {
+						timeout (time: timeouts.deploy, unit: timeouts.unit) {
+							sh "mvn -B -s $MVN_SETTINGS -gs $MVN_SETTINGS deploy -DskipTests"
+						}
+					}
+				}
+			}
+		}
+		currentBuild.result = 'SUCCESS' // Important for the Stash notifier!
+	} catch (error) {
+		currentBuild.result = 'FAILED' // Important for the Stash notifier!
+		throw error
+	} finally {
+		step([$class: 'StashNotifier']) // Notify stash of the build result
+	}
+}
+			
+if (env.BRANCH_NAME == MASTER) {
+	stage ('Release') {
+		def nextVersion = nextVersion(pom)
+		def releaseVersion = releaseVersion(pom)
+		def promote = false
+		def whoPromoted = null
+		stage ('Promote release?') {
+			try {
+				timeout (time: timeouts.release_promote, unit: timeouts.unit) {
+					def userInput = input(
+						id: 'userInput', message: 'Perform release?', submitter: RELEASE_PROMOTERS, submitterParameter: 'submitter', parameters: [
+							[$class: 'TextParameterDefinition', defaultValue: releaseVersion, description: 'Release Version Number', name: 'release_version'],
+							[$class: 'TextParameterDefinition', defaultValue: nextVersion, description: 'Next Version Number', name: 'next_version'],
+						]) 
+					echo "Promoting release: $userInput"
+					promote = true
+					releaseVersion = userInput.release_version
+					nextVersion = userInput.next_version
+					whoPromoted = userInput.submitter
+				}
+			} catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+				echo 'Shall not perform release'
+				promote = false
+			}
+		}
+		if (promote) {
+			node() {
+				sshagent (credentials: ['jenkins-ssh']) {
+					env.PATH = "${tool 'M3'}/bin:${tool 'JDK7'}/bin:${env.PATH}"
+					def releaseBranch = RELEASE_BRANCH_PREFIX + releaseVersion
+	
+					withEnv(["PATH=$env.PATH", "JAVA_HOME=${tool 'JDK7'}"]) {
+						stage ('Pre-Release Cleanup') {
+							timeout (time: timeouts.pre_release, unit: timeouts.unit) {
+								deleteDir()
+								checkout scm
+							}
+						}
+				
+						stage ('Perform Release') {
+							withCredentials([file(credentialsId: 'mavenSettings', variable: 'MVN_SETTINGS')]) {
+								timeout (time: timeouts.release, unit: timeouts.unit) {
+									def tag = artifactId(pom) + '-' + releaseVersion
+									checkout scm
+									def promoterName = getMailaddress(whoPromoted)
+									def promoterMail = getUsername(whoPromoted)
+									// The checkout runs on a detached HEAD that makes the mvn release plugin unhappy
+									// So, create a temp release branch 
+									sh "git checkout -b $releaseBranch"
+									sh "git config user.email \"$promoterName\" && git config user.name \"$promoterMail\""
+									sh "mvn -B -s $MVN_SETTINGS -gs $MVN_SETTINGS clean"
+									sh "mvn -B -s $MVN_SETTINGS -gs $MVN_SETTINGS release:prepare -DreleaseVersion=$releaseVersion -DdevelopmentVersion=$nextVersion -Dtag=$tag -Darguments=\"-DskipTests\""
+									sh "mvn -B -s $MVN_SETTINGS -gs $MVN_SETTINGS release:perform -Darguments=\"-DskipTests\""
+								}
+							}
+						}
+						
+						stage ('Post-Release Cleanup') {
+							timeout (time: timeouts.post_release, unit: timeouts.unit) {
+								sh 'git config push.default simple'
+								// Merge the release branch into the target branch and delete it
+								sh "git checkout $env.BRANCH_NAME"
+								sh 'git pull'
+								sh "git merge --ff $releaseBranch"
+								sh "git push origin $env.BRANCH_NAME"
+								sh "git push origin :$releaseBranch" // Delete remotely by pushing 'nothing'
+								sh "git branch -D $releaseBranch"
+								deleteDir()
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+// End of pipeline
+
+
+// Utility functions for parsing POM files
+// ---------------------------------------
+
+@NonCPS
+def artifactId(String pom) {
+	def pomRoot = new XmlSlurper().parseText(pom)
+    return pomRoot.artifactId.text()
+}
+	
+@NonCPS
+def releaseVersion(String pom) {
+	def pomRoot = new XmlSlurper().parseText(pom)
+    return pomRoot.version.text() - '-SNAPSHOT'
+}
+
+/**
+ * Creates a version number with the next bugfix version number (i.e. last component)
+ */
+@NonCPS
+def nextVersion(String pom) {
+	def current = releaseVersion(pom)
+    final String[] split = current.split('\\.')
+    
+    String result = ''
+    for (int i = 0 ; i < split.length-1 ; i ++)
+      result += split[i] + '.'
+    
+    result += (Integer.parseInt(split[split.length-1])+1)
+	return result + '-SNAPSHOT'
+}
+
+// Utility functions for jenkins user management
+// ---------------------------------------------
+
+def getUsername(String userId) {
+	def fallback = 'Build Server'
+	if (!userId) {
+		return fallback
+	}
+	def user = User.getById(userId, false)
+	return user ? user.fullName : fallback
+}
+
+def getMailaddress(String userId) {
+	def fallback = 'donotreply@levigo.de'
+	if (!userId) {
+		return fallback
+	}
+	def user = User.getById(userId, false)
+	return user ? user.getProperty(hudson.tasks.Mailer.UserProperty.class).address : fallback
+}
