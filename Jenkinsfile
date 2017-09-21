@@ -5,12 +5,40 @@ try {
     stage 'Checkout'
     sh 'echo checking out'
     checkout scm
-	sh "git tag -a ${env.BUILD_TAG} -m 'Jenkins Build Tag ${env.BUILD_TAG}'"
-        sh 'git push origin --tags'
-
-    stage 'Build'
-         sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
+	 checkout([$class: 'GitSCM', branches: [[name: '*/dev']],
+        extensions: [[$class: 'CleanCheckout'],[$class: 'LocalBranch', localBranch: "dev"]]])
 	
+    stage 'Set Version'
+    def originalV = version();
+    def major = originalV[0];
+    def minor = originalV[1];
+    def v = "${major}.${minor}-${env.BUILD_NUMBER}"
+    if (v) {
+       echo "Building version ${v}"
+    }
+    // Update the project pom.xml files
+    sh "${mvnHome}/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${v}"
+    // Add the pom.xml files and create a commit+tag
+    sh 'git add .'
+    sh "git commit -m 'Raise version'"
+    sh "git tag v${v}"
+    
+    // Create the release build
+    stage 'Release Build'
+    // Use the SSH Agent Plugin to forward the used ssh credentials 
+    // from the jenkins master to the jenkins slave. Otherwise you may 
+    // not be able to push/pull, clone
+    sshagent(['pashupathi']) {
+      // Invoke the maven build without tests and deploy the artifacts
+      sh "/opt/maven/bin/mvn -B -DskipTests clean install"
+      // Push the commit and the created tag
+      sh "git push origin master"
+      sh "git push origin v${v}"
+    }
+}
+    /*stage 'Build'
+         sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
+	*/
     stage 'Test'
       sh 'echo test'
 	
