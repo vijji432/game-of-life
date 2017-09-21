@@ -33,7 +33,7 @@ try {
       // Invoke the maven build without tests and deploy the artifacts
       sh "/opt/maven/bin/mvn -B -DskipTests clean install"
       // Push the commit and the created tag
-      sh "git push origin devr"
+      sh "git push origin dev"
       sh "git push origin v${v}"
     }
     
