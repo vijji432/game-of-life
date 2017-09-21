@@ -1,3 +1,4 @@
+node {
 try {
 
     stage 'Checkout'
@@ -40,3 +41,4 @@ try {
       throw err
     
   }
+}
