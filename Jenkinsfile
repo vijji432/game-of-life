@@ -44,6 +44,7 @@ node {
     		sh "/opt/maven/bin/mvn -B versions:set -DgenerateBackupPoms=false -DnewVersion=${v}"
 	
 		// Add the pom.xml files and create a commit+tag
+		sh "git config --global user.name 'vijji432'"
     		sh 'git add .'
     		sh "git commit -m 'Raise version'"
     		sh "git tag v${v}"
