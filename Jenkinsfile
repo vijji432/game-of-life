@@ -50,7 +50,7 @@ node {
     		sh "git tag v${v}"
 		withCredentials([usernamePassword(credentialsId: 'karthik', passwordVariable: 'GITPASSWORD', usernameVariable: 'GITUSERNAME')]) {
  		   sh "git remote set-url origin https://github.com/vijji432/game-of-life.git"	
-	           sh "git tag -a ${env.BUILD_TAG} -m jenkins"
+	           sh "git tag -a ${env.BUILD_TAG} -m jenkins +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/remotes/origin/tags/*"
 		   sh "git remote set-url origin git@github.com:vijji432/game-of-life.git"
                 }
 	
