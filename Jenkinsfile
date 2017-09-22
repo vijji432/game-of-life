@@ -49,7 +49,7 @@ node {
     		sh "git tag v${v}"
 		withCredentials([usernamePassword(credentialsId: 'karthik', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
  		   sh "git tag -a some_tag -m 'Jenkins'"
-    		   sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@game-of-life.git --tags'
+    		   sh 'git push https://vijji432:Surabhi@12@game-of-life.git --tags'
 }
 	
     stage 'Build'
