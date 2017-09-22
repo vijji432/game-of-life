@@ -50,8 +50,7 @@ node {
     		sh "git tag v${v}"
 		withCredentials([usernamePassword(credentialsId: 'karthik', passwordVariable: 'GITPASSWORD', usernameVariable: 'GITUSERNAME')]) {
  		   sh "git remote set-url origin https://github.com/vijji432/game-of-life.git"	
-	           sh("git remote set-url origin git@github.com:vijji432/game-of-life.git")
-                   sh("git remote set-url origin git@github.com:vijji432/game-of-life.git --tags") 
+	           sh("git remote set-url origin git@github.com:vijji432/game-of-life.git") 
 		}
 	
     stage 'Build'
