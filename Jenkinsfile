@@ -51,7 +51,7 @@ node {
 		withCredentials([usernamePassword(credentialsId: 'karthik', passwordVariable: 'Surabhi@12', usernameVariable: 'vijji432')]) {
  		   sh "git remote set-url origin https://github.com/vijji432/game-of-life.git"	
 		   sh "git tag -a some_tag -m 'Jenkins'"
-    		   sh 'git push origin HEAD:dev --tags'
+    		   sh 'git remote set-url origin git@github.com:vijji432/game-of-life.git'
 }
 	
     stage 'Build'
