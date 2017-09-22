@@ -47,7 +47,7 @@ node {
     		sh 'git add .'
     		sh "git commit -m 'Raise version'"
     		sh "git tag v${v}"
-		withCredentials([usernamePassword(credentialsId: 'git-pass-credentials-ID', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+		withCredentials([usernamePassword(credentialsId: 'pashupathi', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
  		   sh "git tag -a some_tag -m 'Jenkins'"
     		   sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@<REPO> --tags'
 }
