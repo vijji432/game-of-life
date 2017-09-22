@@ -47,10 +47,10 @@ node {
 		sh "git config --global user.name 'vijji432'"
     		sh 'git add .'
     		sh "git commit -m 'Raise version'"
-    		sh "+refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/remotes/origin/tags/*"
+    		sh "git tag v${v}"
 		withCredentials([usernamePassword(credentialsId: 'karthik', passwordVariable: 'GITPASSWORD', usernameVariable: 'GITUSERNAME')]) {
  		   sh "git remote set-url origin https://github.com/vijji432/game-of-life.git"	
-		   sh "git tag -a some_tag -m 'Jenkins'"
+			sh "git tag -a ${v} -m 'Jenkins'"
     		   sh 'git remote set-url origin git@github.com:vijji432/game-of-life.git'
 }
 	
