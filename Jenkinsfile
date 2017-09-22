@@ -5,7 +5,7 @@
 def SONAR_HOST = 'http://sonarqube:9000'
 
 // Who is allowed to promote for a release? (comma separated, no blanks!)
-def RELEASE_PROMOTERS = 'pashupathi'
+def RELEASE_PROMOTERS = 'karthik'
 
 // Timeouts how long the individual stages might take before they fail
 def timeouts = [
@@ -17,19 +17,19 @@ def timeouts = [
 	regression: 1,
 	deploy: 2,
 ]
-def GITUSER = credentials('pashupathi')
+def GITUSER = credentials('karthik')
 	
 node {
 	
 	try {
 	stage "Prepare and SCM"
-		sh 'git config --global user.name "pashupathi"'
-    		sh 'git config --global user.email srinivasa.pashupathi@gmail.com'
+		sh 'git config --global user.name "vijji432"'
+    		sh 'git config --global user.email karthikyadav772@gmail.com'
 		sh 'git config --global push.default simple'
 
       		// Cleanup local checkout - TODO there should also be a dedicated jenkins command to invoke this action
     		deleteDir()
-		git branch: 'dev', credentialsId: 'pashupathi', url: 'https://pashupathi@github.com/pashupathi/game-of-life.git'
+		git branch: 'dev', credentialsId: 'karthik', url: 'https://github.com/vijji432/game-of-life.git'
     		// Clone from git
     		checkout scm
     
@@ -47,9 +47,9 @@ node {
     		sh 'git add .'
     		sh "git commit -m 'Raise version'"
     		sh "git tag v${v}"
-		withCredentials([usernamePassword(credentialsId: 'pashupathi', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+		withCredentials([usernamePassword(credentialsId: 'karthik', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
  		   sh "git tag -a some_tag -m 'Jenkins'"
-    		   sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@<REPO> --tags'
+    		   sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@game-of-life.git --tags'
 }
 	
     stage 'Build'
