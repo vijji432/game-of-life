@@ -49,9 +49,10 @@ node {
     		sh "git commit -m 'Raise version'"
     		sh "git tag v${v}"
 		withCredentials([usernamePassword(credentialsId: 'karthik', passwordVariable: 'GITPASSWORD', usernameVariable: 'GITUSERNAME')]) {
- 		   sh "git remote set-url origin https://github.com/vijji432/game-of-life.git"			
-    		   sh 'git remote set-url origin git@github.com:vijji432/game-of-life.git --tags'
-}
+ 		   sh "git remote set-url origin https://github.com/vijji432/game-of-life.git"	
+	           sh("git tag -a ${env.BUILD_TAG} -m '${repositoryCommiterMessage}'")
+                   sh("git push ${repositoryAccess}${env.GITUSERNAME}:${env.GITPASSWORD}@github.com:vijji432/game-of-life.git --tags") 
+		}
 	
     stage 'Build'
          	sh '/opt/maven/bin/mvn clean install -DskipTests -U' 
