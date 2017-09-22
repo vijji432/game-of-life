@@ -49,9 +49,9 @@ node {
     		sh "git commit -m 'Raise version'"
     		sh "git tag v${v}"
 		withCredentials([usernamePassword(credentialsId: 'karthik', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
- 		   sh "git remote set-url origin git@github.com:vijji432/game-of-life.git"	
+ 		   sh "git remote set-url origin https://github.com/vijji432/game-of-life.git"	
 		   sh "git tag -a some_tag -m 'Jenkins'"
-    		   sh 'git push origin HEAD:dev --force'
+    		   sh 'git push origin HEAD:dev --tags'
 }
 	
     stage 'Build'
