@@ -18,6 +18,12 @@ def timeouts = [
 	deploy: 2,
 ]
 def GITUSER = credentials('karthik')
+def TAG_NAME = binding.variables.get("TAG_NAME")
+if (TAG_NAME != null) {
+  sh "echo $TAG_NAME"
+} else {
+  sh "echo Non-tag build"
+}
 	
 node {
 	
@@ -50,8 +56,8 @@ node {
     		sh "git tag v${v}"
 		withCredentials([usernamePassword(credentialsId: 'karthik', passwordVariable: 'GITPASSWORD', usernameVariable: 'GITUSERNAME')]) {
  		   sh "git remote set-url origin https://github.com/vijji432/game-of-life.git"	
-	           sh"git tag -a ${env.BUILD_TAG} -m jenkins"
-		   sh"git remote set-url origin git@github.com:vijji432/game-of-life.git"
+	           sh "git tag -a ${env.BUILD_TAG} -m jenkins"
+		   sh "git remote set-url origin git@github.com:vijji432/game-of-life.git"
                 }
 	
     stage 'Build'
