@@ -87,7 +87,7 @@ node {
      		mail from: 'jenkins@localhost',
         		replyTo: 'build@localhost',
         		subject: "${env.JOB_NAME}-${env.BUILD_NUMBER} build successful",
-        		to: "srinivasa.pashupathi@gmail.com",
+        		to: "karthikyadav772@gmail.com",
 			body: "${env.JOB_NAME}-${env.BUILD_NUMBER} build successful, Please go to ${env.BUILD_URL}."
 		}
 
@@ -98,7 +98,7 @@ node {
     		mail from: 'jenkins@localhost',
       			replyTo: 'build@localhost',
       			subject: "${env.JOB_NAME}-${env.BUILD_NUMBER} build failed",
-      			to: "srinivasa.pashupathi@gmail.com",
+      			to: "karthikyadav772@gmail.com",
       			body: "${env.JOB_NAME}-${env.BUILD_NUMBER} build error is here: ${env.BUILD_URL}, Please go to ${env.BUILD_URL}." 
       throw err
     
