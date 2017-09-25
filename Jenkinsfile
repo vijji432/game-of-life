@@ -51,8 +51,7 @@ node {
  		   sh "git remote set-url origin https://github.com/vijji432/game-of-life.git"	
 	           sh "git tag -a ${env.BUILD_TAG} -m 'jenkins'"
 		   sh "git remote set-url origin git@github.com:vijji432/game-of-life.git"
-		   sh "git push origin :refs/tags
-	           sh "git push --tags"		
+		   sh "git push --tags"
                 }
 	
     stage 'Build'
