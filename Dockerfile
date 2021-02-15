@@ -2,8 +2,8 @@ FROM maven
 
 EXPOSE 9090
 
-COPY src /home/app/src
+COPY target/gameoflife.war /home/app/gameoflife.war
 
-COPY pom.xml /home/app
+WORKDIR /home/app
 
-RUN mvn -f /home/app/pom.xml clean package
+RUN mvn jetty:run
