@@ -50,8 +50,10 @@ pipeline {
 		stage('upload') {
 		    
 			steps {
-			    withAWS(region:'ap-south-1',credentials:'jen-s3')
-                s3Upload(bucket:"kar-buck", path:'/var/lib/jenkins/workspace/gameoflife/', includePathPattern:'**/*.war')
+                           sh 'aws configure set region ap-south-1'
+                           sh 'aws s3 cp ./target/gameoflife-0.0.1-SNAPSHOT.jar s3://kar-buck/gameoflife.jar'			 
+				/ withAWS(region:'ap-south-1',credentials:'jen-s3')
+                //s3Upload(bucket:"kar-buck", path:'/var/lib/jenkins/workspace/gameoflife/', includePathPattern:'**/*.war')
 			}
 		}	
     }
