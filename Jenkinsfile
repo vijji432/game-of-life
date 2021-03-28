@@ -6,7 +6,7 @@ pipeline {
 
         registryCredential = 'dockerhub' 
 
-       // dockerImage = '' 
+        dockerImage = '' 
 
     }
 
@@ -43,5 +43,12 @@ pipeline {
             }
 
         } 
+		stage('upload to aws_bucket) {
+		    
+			steps {
+			    withAWS(region:'ap-south-1',credentials:'jen-s3')
+                s3Upload(bucket:"my-bucket", path:'/var/lib/jenkins/workspace/gameoflife/', includePathPattern:'**/*.war')
+			}
+		}	
     }
 }
