@@ -20,7 +20,7 @@ pipeline {
 					
 	    stage('Publish') {
             environment {
-                registryCredential = 'dock'
+                registryCredential = 'dockerhub'
             }
             steps{
                 script {
