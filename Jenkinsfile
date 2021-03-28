@@ -1,37 +1,45 @@
 pipeline { 
-    
-	agent any 
-	
-		stages {
-		    
-			//stage('build') {
-			
-			//   steps {
-				    
-			//		sh 'mvn clean install'
-			//	}	
-         
-     		//}      
-            //stage('docker build') {
-			    
-			//	steps {
-				 
-			//	    sh 'docker build -t 
-					
-	    stage('Publish') {
-            environment {
-                Credential = 'dockerhub'
-            }
-            steps{
-                script {
-                    def appimage = docker.build registry + ":$BUILD_NUMBER"
-                    docker.withRegistry( '', registryCredential ) {
-                        appimage.push()
-                        appimage.push('latest')
-                    }
-                }
-            }
-        }
-		} 
-		
+
+    environment { 
+
+        registry = "kardock/gameoflife
+
+        registryCredential = 'dockerhub' 
+
+        dockerImage = '' 
+
     }
+
+    agent any 
+
+
+        stage('Building our image') { 
+
+            steps { 
+
+                script { 
+
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
+
+                }
+
+            } 
+
+        }
+
+        stage('Deploy our image') { 
+
+            steps { 
+
+                script { 
+
+                    docker.withRegistry( '', registryCredential ) { 
+
+                        dockerImage.push() 
+
+                    }
+
+                } 
+            }
+
+        } 
