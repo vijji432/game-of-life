@@ -43,11 +43,11 @@ pipeline {
             }
 
         } 
-		stage('upload to aws_bucket) {
+		stage('upload') {
 		    
 			steps {
 			    withAWS(region:'ap-south-1',credentials:'jen-s3')
-                s3Upload(bucket:"my-bucket", path:'/var/lib/jenkins/workspace/gameoflife/', includePathPattern:'**/*.war')
+                s3Upload(bucket:"kar-buck", path:'/var/lib/jenkins/workspace/gameoflife/', includePathPattern:'**/*.war')
 			}
 		}	
     }
