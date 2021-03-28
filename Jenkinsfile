@@ -2,7 +2,7 @@ pipeline {
 
     environment { 
 
-        registry = "kardock/gameoflife"
+        registry = "kardock/gameoflife
 
         registryCredential = 'dockerhub' 
 
@@ -11,7 +11,7 @@ pipeline {
     }
 
     agent any 
-
+    stages {
 
         stage('Building our image') { 
 
@@ -43,4 +43,5 @@ pipeline {
             }
 
         } 
+    }
 }
