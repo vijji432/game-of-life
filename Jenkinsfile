@@ -6,7 +6,7 @@ pipeline {
 
         registryCredential = 'dockerhub' 
 
-        dockerImage = '' 
+       // dockerImage = '' 
 
     }
 
