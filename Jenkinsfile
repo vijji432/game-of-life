@@ -2,7 +2,7 @@ pipeline {
 
     environment { 
 
-        registry = "kardock/gameoflife
+        registry = "kardock/gameoflife"
 
         registryCredential = 'dockerhub' 
 
