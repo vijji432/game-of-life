@@ -4,12 +4,34 @@ pipeline {
 	
 		stages {
 		    
-			stage('build') {
+			#stage('build') {
 			
-			    steps {
+			 #   steps {
 				    
-					sh 'mvn clean install'
-				}	
-            }      
-        } 
+			#		sh 'mvn clean install'
+			#	}	
+         
+     		#}      
+            #stage('docker build') {
+			    
+			#	steps {
+				 
+			#	    sh 'docker build -t 
+					
+	    stage('Publish') {
+            environment {
+                registryCredential = 'dockerhub'
+            }
+            steps{
+                script {
+                    def appimage = docker.build registry + ":$BUILD_NUMBER"
+                    docker.withRegistry( '', registryCredential ) {
+                        appimage.push()
+                        appimage.push('latest')
+                    }
+                }
+            }
+        }
+		} 
+		
     }
