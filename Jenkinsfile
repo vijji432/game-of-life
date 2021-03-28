@@ -4,19 +4,19 @@ pipeline {
 	
 		stages {
 		    
-			#stage('build') {
+			//stage('build') {
 			
-			 #   steps {
+			//   steps {
 				    
-			#		sh 'mvn clean install'
-			#	}	
+			//		sh 'mvn clean install'
+			//	}	
          
-     		#}      
-            #stage('docker build') {
+     		//}      
+            //stage('docker build') {
 			    
-			#	steps {
+			//	steps {
 				 
-			#	    sh 'docker build -t 
+			//	    sh 'docker build -t 
 					
 	    stage('Publish') {
             environment {
