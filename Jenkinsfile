@@ -1,28 +1,32 @@
 pipeline { 
     agent any 
         stages { 
-		stage('build') {
-		    steps {
+		    stage('build') {
+		        steps {
 	                sh 'mvn clean install'
-		    }
-		}	
-    	stage('Code Quality Check via SonarQube') {
-            steps {
-                script {
-                    def scannerHome = tool 'sonarqube-scanner';
-                    withSonarQubeEnv(installationName: 'Sonarqub', credentialsId: 'jen-son')  {
-                    sh "${tool("sonarqube-scanner")}/bin/sonar-scanner \
-                    -Dsonar.organistaion=Org-name \
-                    -Dsonar.projectKey=project-name 
-	     			}
-                }
-			}
-        }
-        stage("Quality Gate") {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                waitForQualityGate abortPipeline: true
-                }
+		        }
+		    }	
+    	    
+			stage('Code Quality Check via SonarQube') {
+                steps {
+                    script {
+                        def scannerHome = tool 'sonarqube-scanner';
+                        withSonarQubeEnv(installationName: 'Sonarqub', credentialsId: 'jen-son')  {
+                        sh "${tool("sonarqube-scanner")}/bin/sonar-scanner \
+                       -Dsonar.organistaion=Org-name \
+                       -Dsonar.projectKey=project-name 
+					   }
+                    }
+			    }
+            }
+			
+            stage("Quality Gate") {
+                steps {
+                    timeout(time: 1, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                    
+					}             
+				}
             }
         }
 		
