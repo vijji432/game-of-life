@@ -14,7 +14,28 @@ pipeline {
         stage("Publish to Nexus Repository Manager") {
             steps {
                 script {
-                    nexusPublisher nexusInstanceId: 'nexus', nexusRepositoryId: 'maven-releases', packages: [[$class: 'MavenPackage', mavenAssetList: [[classifier: 'clean install ', extension: 'true', filePath: '~/.m2']], mavenCoordinate: [artifactId: 'gameoflife', groupId: 'com.wakaleo.gameoflife', packaging: 'pom', version: '1.0-SNAPSHOT']]], tagName: 'v1'
+                    pipeline {
+    agent any 
+	
+   
+    stages {
+        
+        stage("Maven Build") {
+            steps {
+                script {
+                    sh "mvn clean install"
+                }
+            }
+        }
+        stage("Publish to Nexus Repository Manager") {
+            steps {
+                script {
+                    nexusArtifactUploader artifacts: [[artifactId: 'gameoflife', classifier: 'default', file: '**/*.war', type: 'gameoflife.war']], credentialsId: 'je-ne', groupId: 'com.wakaleo.gameoflife', nexusUrl: '35.237.118.69:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: '1.0-SNAPSHOT
+                }
+            }
+        }
+    }
+}
                 }
             }
         }
