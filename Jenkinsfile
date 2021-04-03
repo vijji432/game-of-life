@@ -8,7 +8,7 @@ pipeline {
 			}
             stage('artifactory') {
                 steps {
-    				server = Artifactory.server 'artifactory', credentialsId: 'jen-art'
+			server = Artifactory.server 'artifactory', credentialsId: 'jen-art' {
                      uploadSpec = """{
                       "files": [
                         {
@@ -16,6 +16,7 @@ pipeline {
                           "target": "libs-release/"
                         }
                      ]
+		     }
                     }"""
                     server.upload spec: uploadSpec
 					rtPublishBuildInfo (
