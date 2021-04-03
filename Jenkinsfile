@@ -8,10 +8,13 @@ pipeline {
 		    }	
     	    
 			stage('SonarQube analysis') {
-                withSonarQubeEnv(credentialsId: 'jen-son', installationName: 'sonarqub') { // You can override the credential to be used
-                sh 'mvn org.sonarsource.scanner.maven:sonar:sonar'
-                } 
+                steps {
+				    withSonarQubeEnv(credentialsId: 'jen-son', installationName: 'sonarqub') { // You can override the credential to be used
+                    sh 'mvn org.sonarsource.scanner.maven:sonar:sonar'
+                    } 
+				}	
             }
+			
 
 			
             stage("Quality Gate") {
@@ -23,14 +26,7 @@ pipeline {
 				}
             }
 			
-            stage("Quality Gate") {
-                steps {
-                    timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                    
-					}             
-				}
-            }
+            
         }
 		
 }
