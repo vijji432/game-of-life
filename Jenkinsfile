@@ -14,7 +14,7 @@ pipeline {
                     sh "${tool("sonarqube-scanner")}/bin/sonar-scanner \
                     -Dsonar.organistaion=Org-name \
                     -Dsonar.projectKey=project-name \
-                    -Dsonar.sources=. \
+                    -Dsonar.sources=. 
 	     			}
                 }
 			}
