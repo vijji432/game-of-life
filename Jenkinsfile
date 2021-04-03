@@ -3,12 +3,7 @@ pipeline {
     environment { 
 
    
-	    
-	AWS_ACCESS_KEY_ID     = credentials('aws_access_key_id')
-        AWS_SECRET_ACCESS_KEY = credentials('secret_access_key_id')
-    }  
-
-    
+	
 
     agent any 
         stages { 
@@ -17,14 +12,23 @@ pipeline {
 	                sh 'mvn clean install'
 		    }
 		}	
-	        stage('upload') {
-		    
-			steps {
-                           sh 'aws configure set region ap-south-1'
-                           sh 'aws s3 cp ./target/gameoflife-0.0.1-SNAPSHOT.jar s3://kar-buck/gameoflife.jar'			 
-				// withAWS(region:'ap-south-1',credentials:'jen-s3')
-                //s3Upload(bucket:"kar-buck", path:'/var/lib/jenkins/workspace/gameoflife/', includePathPattern:'**/*.war')
-			}
-		}	
-         }
+	         stage('Code Quality Check via SonarQube') {
+                     steps {
+                         script {
+                             def scannerHome = tool 'sonarqube-scanner';
+                             withSonarQubeEnv(installationName: 'Sonarqub', credentialsId: 'jen-son')  {
+                             sh "${tool("sonarqube-scanner")}/bin/sonar-scanner \
+                             -Dsonar.organistaion=Org-name \
+                             -Dsonar.projectKey=project-name \
+                             -Dsonar.sources=. \
+                         }
+                       }
+                      }
+                 }
+stage("Quality Gate") {
+  steps {
+    timeout(time: 1, unit: 'MINUTES') {
+        waitForQualityGate abortPipeline: true
+    }
+  }
 }
