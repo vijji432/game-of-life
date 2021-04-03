@@ -1,9 +1,9 @@
 pipeline {
     agent any 
     environment {	
-        def server
-        def buildInfo
-        def rtMaven
+        def server = ''
+        def buildInfo = ''
+        def rtMaven = ''
     }	    
 	stages {
             stage ('Artifactory configuration') {
