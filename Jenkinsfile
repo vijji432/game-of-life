@@ -7,17 +7,33 @@ pipeline {
 		        }
 		    }	
     	    
-			stage('Code Quality Check via SonarQube') {
+			pipeline { 
+    agent any 
+        stages { 
+		    stage('build') {
+		        steps {
+	                sh 'mvn clean install'
+		        }
+		    }	
+    	    
+			stage('SonarQube analysis') {
+    withSonarQubeEnv(credentialsId: 'jen-son', installationName: 'sonarqub') { // You can override the credential to be used
+      sh 'mvn org.sonarsource.scanner.maven:sonar:sonar'
+    }
+  }
+}
+			
+            stage("Quality Gate") {
                 steps {
-                    script {
-                        def scannerHome = tool 'sonarqube-scanner';
-                            withSonarQubeEnv(installationName: 'Sonarqub', credentialsId: 'jen-son')  {
-                            sh "${tool("sonarqube-scanner")}/bin/sonar-scanner \
-		            -Dsonar.organistaion=Org-name \
-	                    -Dsonar.projectKey=project-name }
-                    }
-			    }
+                    timeout(time: 1, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                    
+					}             
+				}
             }
+        }
+		
+}
 			
             stage("Quality Gate") {
                 steps {
