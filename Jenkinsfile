@@ -1,36 +1,31 @@
 pipeline {
-    agent any 
-    environment {	
-        def server = ''
-        def buildInfo = ''
-        def rtMaven = ''
-    }	    
-	stages {
-            stage ('Artifactory configuration') {
-        // Obtain an Artifactory server instance, defined in Jenkins --> Manage:
-                server = Artifactory.Server 'artifactory', credentialsId: 'jen-art'
-                rtMaven = Artifactory.newMavenBuild()
-                rtMaven.tool = 'mvn' // Tool name from Jenkins configuration
-                rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local', server: server
-                rtMaven.resolver releaseRepo: 'libs-release', snapshotRepo: 'libs-snapshot', server: server
-                rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-                buildInfo = Artifactory.newBuildInfo()
-            }
- 
-            stage ('Test') {
-                rtMaven.run pom: 'maven-example/pom.xml', goals: 'clean test'
-            }
-        
-            stage ('Install') {
-                rtMaven.run pom: 'maven-example/pom.xml', goals: 'install', buildInfo: buildInfo
-            }
- 
-            stage ('Deploy') {
-                rtMaven.deployer.deployArtifacts buildInfo
-            }
-        
-            stage ('Publish build info') {
-                server.publishBuildInfo buildInfo
-            }
-   }
-}
+    agent any
+	    stages {
+		    stage('build') {
+			    steps {
+				    sh 'mvn clean install'
+				}
+			}
+            stage('artifactory') {
+                steps {
+				    script {
+    				    def server = Artifactory.server 'artifactory', credentialsId: 'jen-art' 
+                        def uploadSpec = """{
+                          "files": [
+                            {
+                              "pattern": "**/*.war",
+                              "target": "libs-release/"
+                            }
+                         ]
+					
+                        }"""
+					    
+                        server.upload spec: uploadSpec
+					    rtPublishBuildInfo (
+                            serverId: 'artifactory'
+					    )
+                    }						
+                }
+			}
+		}	
+} 
