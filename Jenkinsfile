@@ -1,10 +1,7 @@
 pipeline {
     agent any
-	environment {
-	    def server = Artifactory.server 'artifactory', credentialsId: 'jen-art'
-	}
-	    stages {
-		    stage('build') {
+	stages {
+	    stage('build') {
 			    steps {
 				    sh 'mvn clean install'
 				}
@@ -12,7 +9,7 @@ pipeline {
             stage('artifactory') {
                 steps {
 				    script {
-    				  
+    			 def server = Artifactory.newServer url: 'http://35.237.118.69:8082/artifactory', credentialsId: 'jen-art'	  
                         def uploadSpec = """{
                           "files": [
                             {
