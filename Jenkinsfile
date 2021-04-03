@@ -10,7 +10,7 @@ pipeline {
 			stage('SonarQube analysis') {
                 steps {
 				    withSonarQubeEnv(credentialsId: 'jen-son', installationName: 'sonarqub') { // You can override the credential to be used
-                    sh 'mvn org.sonarsource.scanner.maven:sonar:sonar'
+                    sh 'mvn sonar:sonar'
                     } 
 				}	
             }
