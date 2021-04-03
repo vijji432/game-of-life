@@ -16,8 +16,9 @@ pipeline {
                           "target": "libs-release/"
                         }
                      ]
-		     }
+		     
                     }"""
+			}	
                     server.upload spec: uploadSpec
 					rtPublishBuildInfo (
                         serverId: 'artifactory'
