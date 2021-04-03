@@ -8,8 +8,8 @@ pipeline {
 			}
             stage('artifactory') {
                 steps {
-    				def server = Artifactory.server 'artifactory', credentialsId: 'jen-art'
-                    def uploadSpec = """{
+    				server = Artifactory.server 'artifactory', credentialsId: 'jen-art'
+                     uploadSpec = """{
                       "files": [
                         {
                           "pattern": "**/*.war",
