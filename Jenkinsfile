@@ -22,3 +22,4 @@ pipeline {
         server.publishBuildInfo buildInfo
     }
 }
+}
