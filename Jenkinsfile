@@ -9,7 +9,7 @@ pipeline {
             stage('artifactory') {
                 steps {
 				    script {
-    			 def server = Artifactory.newServer url: 'http://35.237.118.69:8082/artifactory', credentialsId: 'jen-art'	  
+    			 def server = serverId: 'artifactory', credentialsId: 'jen-art'	  
                         def uploadSpec = """{
                           "files": [
                             {
