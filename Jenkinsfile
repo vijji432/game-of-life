@@ -2,6 +2,7 @@ pipeline {
     agent any
 	environment {
 	    def server = Artifactory.server 'artifactory', credentialsId: 'jen-art'
+	}
 	    stages {
 		    stage('build') {
 			    steps {
