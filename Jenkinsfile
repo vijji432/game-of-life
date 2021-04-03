@@ -11,8 +11,10 @@ pipeline {
                 steps {
                     script {
                         def scannerHome = tool 'sonarqube-scanner';
-                        withSonarQubeEnv(installationName: 'Sonarqub', credentialsId: 'jen-son')  {
-                        sh "${tool("sonarqube-scanner")}/bin/sonar-scanner  -Dsonar.organistaion=Org-name -Dsonar.projectKey=project-name 
+                            withSonarQubeEnv(installationName: 'Sonarqub', credentialsId: 'jen-son')  {
+                            sh "${tool("sonarqube-scanner")}/bin/sonar-scanner
+		            -Dsonar.organistaion=Org-name 
+	                    -Dsonar.projectKey=project-name 
 					   }
                     }
 			    }
