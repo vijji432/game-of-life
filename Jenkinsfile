@@ -1,13 +1,14 @@
 pipeline {
     agent any 
-	
-    def server
-    def buildInfo
-    def rtMaven
+    environment {	
+        def server
+        def buildInfo
+        def rtMaven
+    }	    
 	stages {
             stage ('Artifactory configuration') {
         // Obtain an Artifactory server instance, defined in Jenkins --> Manage:
-                server = Artifactory.newServer url: 'http://localhost:8081/artifactory', username: 'admin', password: 'password'
+                server = Artifactory.Server 'artifactory', credentialsId: 'jen-art'
                 rtMaven = Artifactory.newMavenBuild()
                 rtMaven.tool = 'mvn' // Tool name from Jenkins configuration
                 rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local', server: server
