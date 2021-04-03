@@ -1,10 +1,7 @@
-def call(body) {
-def config = [:]
-body.resolveStrategy = Closure.DELEGATE_FIRST
-body.delegate = config
-body()
 pipeline {
     agent any
+	environment {
+	    def server = Artifactory.server 'artifactory', credentialsId: 'jen-art'
 	    stages {
 		    stage('build') {
 			    steps {
@@ -14,7 +11,7 @@ pipeline {
             stage('artifactory') {
                 steps {
 				    script {
-    				    def server = Artifactory.server 'artifactory', credentialsId: 'jen-art' 
+    				  
                         def uploadSpec = """{
                           "files": [
                             {
@@ -34,4 +31,4 @@ pipeline {
 			}
 		}	
 } 
-}
+
