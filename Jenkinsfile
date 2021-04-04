@@ -14,8 +14,7 @@ pipeline {
                             rtMaven.tool = 'maven'
                             rtMaven.deployer server: server, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
                             rtMaven.deployer.artifactDeploymentPatterns.addInclude("**/*.war")
-                            rtPublishBuildInfo (
-                                serverId: 'artifactory'
+                         
                             )
 			}
 		    }	    
