@@ -9,7 +9,7 @@ pipeline {
             stage ('Artifactory configuration') {
         // Obtain an Artifactory server instance, defined in Jenkins --> Manage:
 		        steps {
-			        scripts {
+			        script {
                         def server = Artifactory.newServer url: 'http://localhost:8081/artifactory', username: 'admin', password: 'Art1factoryadmin'
                         rtMaven = Artifactory.newMavenBuild()
                         rtMaven.tool = 'maven' // Tool name from Jenkins configuration
