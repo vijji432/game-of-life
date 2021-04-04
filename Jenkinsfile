@@ -11,7 +11,7 @@ pipeline {
 		        steps {
 			        script {
                         def server = Artifactory.newServer url: 'http://localhost:8081/artifactory', username: 'admin', password: 'Art1factoryadmin'
-                        rtMaven = Artifactory.newMavenBuild()
+                        def rtMaven = Artifactory.newMavenBuild()
                         rtMaven.tool = 'maven' // Tool name from Jenkins configuration
                         rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local', server: server
                         rtMaven.resolver releaseRepo: 'libs-release', snapshotRepo: 'libs-snapshot', server: server
@@ -24,12 +24,20 @@ pipeline {
           
  
             stage ('Deploy') {
-                rtMaven.deployer.deployArtifacts buildInfo
-            } 
-        
+			    steps {
+				    script {
+                        rtMaven.deployer.deployArtifacts buildInfo
+                    }  
+                }
+			}	
             stage ('Publish build info') {
-                server.publishBuildInfo buildInfo
-            }
+			    steps {
+				    script {
+                        server.publishBuildInfo buildInfo
+                    }
+				}
+			}	
         }
+		
 }
 
