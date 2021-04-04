@@ -1,43 +1,22 @@
 pipeline {
-    agent any
-        stages {
-	        stage('build') {
-	            steps {
-	                sh 'mvn clean install'
-		        }
-	        }
-            stage ('Artifactory configuration') {
-        // Obtain an Artifactory server instance, defined in Jenkins --> Manage:
-		        steps {
-			        script {
-                        def server = Artifactory.newServer url: 'http://localhost:8081/artifactory', username: 'admin', password: 'Art1factoryadmin'
-                        def rtMaven = Artifactory.newMavenBuild()
-                        rtMaven.tool = 'maven' // Tool name from Jenkins configuration
-                        rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local', server: server
-                        rtMaven.resolver releaseRepo: 'libs-release', snapshotRepo: 'libs-snapshot', server: server
-                        rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-
-                        buildInfo  = Artifactory.newBuildInfo()
-                    }
-		        }
-	        }
-          
- 
-            stage ('Deploy') {
-			    steps {
-				    script {
-                        rtMaven.deployer.deployArtifacts buildInfo
-                    }  
+    agent any 
+	
+   
+    stages {
+        
+        stage("Maven Build") {
+            steps {
+                script {
+                    sh "mvn clean install"
                 }
-			}	
-            stage ('Publish build info') {
-			    steps {
-				    script {
-                        server.publishBuildInfo buildInfo
-                    }
-				}
-			}	
+            }
         }
-		
+        stage("Publish to Nexus Repository Manager") {
+            steps {
+                script {
+                    nexusArtifactUploader artifacts: [[artifactId: 'gameoflife', classifier: '', file: 'target/**.war', type: 'war']], credentialsId: 'je-ne', groupId: 'com.wakaleo.gameoflife', nexusUrl: '35.243.158.65:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: '1.0.0'
+                }
+            }
+        }
+    }
 }
-
