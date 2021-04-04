@@ -1,46 +1,20 @@
 pipeline {
-    agent 
-    tools {
-        maven "Maven"
-    }
-	
-   
-    stages {
-        
-        stage("Maven Build") {
-            steps {
-                script {
-                    sh "mvn clean install"
-                }
+    agent any
+        stages {
+	    stage('build') {
+	        steps {
+	            sh 'mvn clean install'
+		}
+	    }
+            stage('Publish') {
+                def server = Artifactory.server 'artifactory'
+                def rtMaven = Artifactory.newMavenBuild()
+                rtMaven.tool = 'maven'
+                rtMaven.deployer server: server, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
+                rtMaven.deployer.artifactDeploymentPatterns.addInclude("**/*.war")
+                def buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install'
+                rtMaven.deployer.deployArtifacts buildInfo
+                server.publishBuildInfo buildInfo
             }
-        }
-        stage("Publish to Nexus Repository Manager") {
-            steps {
-                script {
-                    pipeline {
-    agent any 
-	
-   
-    stages {
-        
-        stage("Maven Build") {
-            steps {
-                script {
-                    sh "mvn clean install"
-                }
-            }
-        }
-        stage("Publish to Nexus Repository Manager") {
-            steps {
-                script {
-                    nexusArtifactUploader artifacts: [[artifactId: 'gameoflife', classifier: 'default', file: '**/*.war', type: 'gameoflife.war']], credentialsId: 'je-ne', groupId: 'com.wakaleo.gameoflife', nexusUrl: '35.237.118.69:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'maven-releases', version: '1.0-SNAPSHOT'
-                }
-            }
-        }
-    }
-}
-                }
-            }
-        }
-    }
+          }
 }
