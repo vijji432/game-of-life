@@ -7,14 +7,18 @@ pipeline {
 		}
 	    }
             stage('Publish') {
-                def server = Artifactory.server 'artifactory'
-                def rtMaven = Artifactory.newMavenBuild()
-                rtMaven.tool = 'maven'
-                rtMaven.deployer server: server, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
-                rtMaven.deployer.artifactDeploymentPatterns.addInclude("**/*.war")
-                def buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install'
-                rtMaven.deployer.deployArtifacts buildInfo
-                server.publishBuildInfo buildInfo
+		    steps {
+			script {			    
+                            def server = Artifactory.server 'artifactory'
+                            def rtMaven = Artifactory.newMavenBuild()
+                            rtMaven.tool = 'maven'
+                            rtMaven.deployer server: server, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
+                            rtMaven.deployer.artifactDeploymentPatterns.addInclude("**/*.war")
+                            def buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install'
+                            rtMaven.deployer.deployArtifacts buildInfo
+                            server.publishBuildInfo buildInfo
+			}
+		    }	    
             }
           }
 }
