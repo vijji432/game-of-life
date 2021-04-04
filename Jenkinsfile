@@ -29,10 +29,13 @@ pipeline {
 			}
         }			
 		stage('Results') {
-            junit '**/target/surefire-reports/TEST-*.xml'
-            archive 'target/*.war'
+            steps {
+			    script {
+				    junit '**/target/surefire-reports/TEST-*.xml'
+                    archive 'target/*.war'
+				}
+            }				
 		}
     }
 }
 	
-
