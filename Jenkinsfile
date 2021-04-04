@@ -21,13 +21,7 @@ pipeline {
                     }
 		        }
 	        }
-            stage ('Test') {
-                rtMaven.run pom: 'gameoflife/pom.xml', goals: 'clean test'
-            }
-        
-            stage ('Install') {
-                rtMaven.run pom: 'gameoflife/pom.xml', goals: 'install', buildInfo: buildInfo
-            }
+          
  
             stage ('Deploy') {
                 rtMaven.deployer.deployArtifacts buildInfo
