@@ -15,7 +15,7 @@ pipeline {
                             rtMaven.deployer server: server, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
                             rtMaven.deployer.artifactDeploymentPatterns.addInclude("**/*.war")
                          
-                            )
+                            
 			}
 		    }	    
             }
